@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'DM Sans',sans-serif;color:#0F172A}
+a{color:#059669}a:hover{color:#047857}
+button{font-family:inherit;cursor:pointer}
+@keyframes bar{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(217,119,6,.45)}100%{box-shadow:0 0 0 22px rgba(217,119,6,0)}}
+@keyframes ringr{0%{box-shadow:0 0 0 0 rgba(225,29,72,.5)}100%{box-shadow:0 0 0 26px rgba(225,29,72,0)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shake{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+@keyframes scan{0%{top:4%}100%{top:94%}}
+@keyframes pop{0%{opacity:0;transform:translateY(8px) scale(.96)}100%{opacity:1;transform:none}}
+@keyframes fade{0%{opacity:0}100%{opacity:1}}
+</style>
+</helmet>
+
+<div style="display:flex;height:100vh;min-height:760px;background:#F8FAFC;overflow:hidden;position:relative">
+
+<!-- SIDEBAR -->
+<aside style="width:232px;flex:none;background:#fff;border-right:1px solid #E2E8F0;display:flex;flex-direction:column;padding:20px 14px;gap:20px;box-sizing:border-box">
+  <div style="display:flex;align-items:center;gap:10px;padding:0 6px">
+    <div style="width:38px;height:34px;background:#FF7A5C;border-radius:20px 20px 12px 12px;position:relative;flex:none"><div style="position:absolute;left:7px;top:12px;width:6px;height:6px;border-radius:50%;background:#1E1B2E"></div><div style="position:absolute;right:7px;top:12px;width:6px;height:6px;border-radius:50%;background:#1E1B2E"></div><div style="position:absolute;left:14px;top:20px;width:10px;height:5px;border-bottom:2px solid #1E1B2E;border-radius:0 0 10px 10px"></div></div>
+    <div style="font:800 21px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">Sous</div>
+  </div>
+  <nav style="display:flex;flex-direction:column;gap:4px">
+    <div style="font:500 11px 'DM Mono',monospace;color:#64748B;letter-spacing:.08em;padding:0 8px 6px">WORKFLOW</div>
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="3">
+      <button onClick="{{ n.go }}" style="display:flex;align-items:center;gap:12px;border:0;text-align:left;padding:11px 12px;border-radius:12px;font:600 15px 'DM Sans',sans-serif;background:{{ n.bg }};color:{{ n.fg }}">
+        <span style="width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font:600 12px 'DM Mono',monospace;background:{{ n.badgeBg }};color:{{ n.badgeFg }}">{{ n.num }}</span>{{ n.label }}
+      </button>
+    </sc-for>
+  </nav>
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font:500 11px 'DM Mono',monospace;color:#64748B;letter-spacing:.08em;padding:0 8px 6px">PANTRY</div>
+    <sc-for list="{{ catCounts }}" as="c" hint-placeholder-count="5">
+      <div style="display:flex;justify-content:space-between;padding:6px 12px;font-size:14px;color:#334155"><span>{{ c.cat }}</span><span style="font-family:'DM Mono',monospace;color:#64748B">{{ c.n }}</span></div>
+    </sc-for>
+  </div>
+  <div style="margin-top:auto;background:#ECFDF5;border:1px solid #A7F3D0;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px;font:700 11px 'DM Mono',monospace;color:#047857;letter-spacing:.06em"><span style="width:16px;height:16px;border-radius:50%;background:#059669;color:#fff;display:grid;place-items:center;font-size:10px">✓</span>SAFETY</div>
+    <div style="font-size:13px;line-height:1.45;color:#065F46">Allergens strictly verified using rule-based algorithms.</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div style="flex:1;min-width:0;display:flex;flex-direction:column">
+  <header style="display:flex;align-items:center;gap:20px;padding:14px 28px;background:#fff;border-bottom:1px solid #E2E8F0;position:relative;z-index:5">
+    <div style="display:flex;align-items:center;gap:8px;font-size:14px;white-space:nowrap">
+      <sc-for list="{{ crumbs }}" as="c" hint-placeholder-count="2">
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:#94A3B8;display:{{ c.sepDisplay }}">/</span><button onClick="{{ c.go }}" style="border:0;background:none;padding:0;font:600 14px 'DM Sans',sans-serif;color:{{ c.fg }}">{{ c.label }}</button></div>
+      </sc-for>
+    </div>
+    <div style="flex:1;max-width:560px;margin-left:auto;position:relative">
+      <div style="display:flex;align-items:center;gap:10px;background:#F1F5F9;border:1px solid #E2E8F0;border-radius:14px;padding:0 8px 0 14px;height:44px">
+        <span style="color:#64748B;font-size:16px">⌕</span>
+        <input value="{{ query }}" onInput="{{ onQuery }}" onFocus="{{ openSearch }}" placeholder="Search ingredients, recipes, or say a command" style="flex:1;border:0;background:none;outline:0;font:500 15px 'DM Sans',sans-serif;color:#0F172A;min-width:0">
+        <button onClick="{{ goScan }}" style="border:0;background:#fff;border-radius:10px;height:30px;padding:0 10px;font:600 12px 'DM Sans',sans-serif;color:#334155;box-shadow:0 0 0 1px #E2E8F0">Photo</button>
+        <button onClick="{{ pillMic }}" style="border:0;background:#059669;color:#fff;border-radius:10px;height:30px;padding:0 10px;font:600 12px 'DM Sans',sans-serif">Voice</button>
+      </div>
+      <sc-if value="{{ showSuggest }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;top:50px;left:0;right:0;background:#fff;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 18px 40px rgba(15,23,42,.14);padding:6px;animation:pop .18s ease-out">
+          <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="3">
+            <button onClick="{{ s.pick }}" style="display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;text-align:left;padding:10px;border-radius:10px;font:500 14px 'DM Sans',sans-serif;color:#0F172A" style-hover="background:#F1F5F9">
+              <span style="font:500 10px 'DM Mono',monospace;padding:3px 7px;border-radius:6px;background:{{ s.bg }};color:{{ s.fg }};min-width:58px;text-align:center">{{ s.type }}</span>{{ s.label }}<span style="margin-left:auto;color:#64748B;font-size:12px">{{ s.hint }}</span>
+            </button>
+          </sc-for>
+          <sc-if value="{{ noSuggest }}" hint-placeholder-val="{{ false }}"><div style="padding:12px;color:#64748B;font-size:14px">No matches. Try “tomato” or “soup”.</div></sc-if>
+        </div>
+      </sc-if>
+    </div>
+    <div style="width:38px;height:38px;border-radius:50%;background:#FEF3C7;color:#92400E;display:grid;place-items:center;font:700 14px 'DM Sans',sans-serif">AG</div>
+  </header>
+
+  <main onClick="{{ closeSearch }}" style="flex:1;overflow:auto;padding:28px 28px 110px;box-sizing:border-box">
+
+  <!-- SCREEN: SCAN -->
+  <sc-if value="{{ isScan }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;flex-direction:column;gap:28px;animation:fade .3s">
+    <div style="display:flex;align-items:end;justify-content:space-between;gap:20px">
+      <div><div style="font:800 34px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">Verify your pantry</div><div style="color:#64748B;font-size:16px;margin-top:8px">5 items detected. Confirm, edit, then match recipes.</div></div>
+      <button onClick="{{ goRecipes }}" style="border:0;background:#059669;color:#fff;border-radius:14px;height:48px;padding:0 24px;font:700 16px 'DM Sans',sans-serif">Confirm and match recipes →</button>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:24px;align-items:start">
+      <div style="background:#fff;border:1px solid #E2E8F0;border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:12px">
+        <div style="position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:repeating-linear-gradient(135deg,#E7E5DC 0 14px,#EFEDE5 14px 28px)">
+          <div style="position:absolute;left:14px;top:12px;font:500 11px 'DM Mono',monospace;color:#64748B;background:rgba(255,255,255,.85);padding:4px 8px;border-radius:6px">photo: kitchen counter, 1920×1200 (drop image)</div>
+          <div style="position:absolute;left:0;right:0;height:2px;background:#059669;box-shadow:0 0 18px 4px rgba(5,150,105,.45);animation:scan 3.2s ease-in-out infinite alternate"></div>
+          <sc-for list="{{ boxes }}" as="b" hint-placeholder-count="4">
+            <div style="position:absolute;left:{{ b.x }}%;top:{{ b.y }}%;width:{{ b.w }}%;height:{{ b.h }}%;border:2.5px solid #059669;border-radius:10px;background:rgba(5,150,105,.08);animation:pop .4s both">
+              <div style="position:absolute;left:-2px;top:-30px;background:#059669;color:#fff;font:600 13px 'DM Sans',sans-serif;padding:4px 9px;border-radius:8px;white-space:nowrap">{{ b.label }} <span style="font-family:'DM Mono',monospace;font-weight:500">({{ b.pct }}%)</span></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:0 4px">
+          <span style="font-size:13px;color:#64748B">Camera ready · last scan just now</span>
+          <button onClick="{{ rescan }}" style="margin-left:auto;border:1px solid #E2E8F0;background:#fff;border-radius:10px;height:36px;padding:0 14px;font:600 13px 'DM Sans',sans-serif">Re-scan</button>
+          <button style="border:0;background:#0F172A;color:#fff;border-radius:10px;height:36px;padding:0 14px;font:600 13px 'DM Sans',sans-serif">Upload photo</button>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E2E8F0;border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div style="font:700 20px 'Bricolage Grotesque',sans-serif">Confirmed ingredients</div><div style="font:500 12px 'DM Mono',monospace;color:#64748B">{{ ingCount }} ITEMS</div></div>
+        <div style="display:flex;flex-direction:column;gap:14px;max-height:300px;overflow:auto">
+          <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+            <div>
+              <div style="font:500 11px 'DM Mono',monospace;color:#64748B;letter-spacing:.08em;margin-bottom:8px">{{ g.cat }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <sc-for list="{{ g.items }}" as="i" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:2px;background:#F1F5F9;border-radius:12px;padding:4px 6px 4px 12px;font:600 14px 'DM Sans',sans-serif">
+                    {{ i.name }}
+                    <button onClick="{{ i.minus }}" style="border:0;background:none;width:22px;height:22px;color:#64748B;font-size:16px">−</button><span style="font:500 12px 'DM Mono',monospace;background:#fff;border-radius:6px;padding:2px 6px;color:#0F172A">{{ i.qty }}</span><button onClick="{{ i.plus }}" style="border:0;background:none;width:22px;height:22px;color:#64748B;font-size:16px">+</button>
+                    <button onClick="{{ i.remove }}" style="border:0;background:none;width:22px;height:22px;color:#E11D48;font-size:12px">✕</button>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px"><input value="{{ addText }}" onInput="{{ onAdd }}" onKeyDown="{{ addKey }}" placeholder="Add an ingredient, press Enter" style="flex:1;height:42px;border:1px solid #E2E8F0;border-radius:12px;padding:0 14px;font:500 14px 'DM Sans',sans-serif;outline:0;background:#F8FAFC"><button onClick="{{ addIng }}" style="border:0;background:#0F172A;color:#fff;border-radius:12px;padding:0 16px;font:600 14px 'DM Sans',sans-serif">Add</button></div>
+        <div style="border-top:1px solid #E2E8F0;padding-top:18px;display:flex;flex-direction:column;gap:14px">
+          <div style="font:500 11px 'DM Mono',monospace;color:#64748B;letter-spacing:.08em">RESTRICTIONS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ diets }}" as="d" hint-placeholder-count="3">
+              <button onClick="{{ d.toggle }}" style="border:1.5px solid {{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};border-radius:999px;height:38px;padding:0 16px;font:600 14px 'DM Sans',sans-serif">{{ d.mark }}{{ d.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px"><span style="font:600 14px 'DM Sans',sans-serif;white-space:nowrap">Max cooking time</span><input type="range" min="10" max="60" step="5" value="{{ maxTime }}" onInput="{{ onTime }}" style="flex:1;accent-color:#059669"><span style="font:600 14px 'DM Mono',monospace;background:#FEF3C7;color:#92400E;border-radius:8px;padding:4px 10px">{{ maxTime }} min</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px"><div style="font:700 22px 'Bricolage Grotesque',sans-serif">Recipe matches <span style="font:500 13px 'DM Mono',monospace;color:#64748B;margin-left:8px">{{ recCount }} PASS THE RULE ENGINE</span></div><button onClick="{{ goRecipes }}" style="border:0;background:none;font:600 14px 'DM Sans',sans-serif;color:#059669">See all with filters →</button></div>
+      <div style="display:flex;gap:16px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory">
+        <sc-for list="{{ recs }}" as="r" hint-placeholder-count="3">
+          <div style="flex:none;width:300px;scroll-snap-align:start;background:#fff;border:1px solid #E2E8F0;border-radius:20px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="height:110px;background:repeating-linear-gradient(135deg,{{ r.c1 }} 0 12px,{{ r.c2 }} 12px 24px);display:flex;align-items:end;padding:10px"><span style="font:500 10px 'DM Mono',monospace;background:rgba(255,255,255,.9);padding:3px 7px;border-radius:6px;color:#64748B">dish photo</span></div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+              <div style="font:700 19px 'Bricolage Grotesque',sans-serif">{{ r.name }}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap"><span style="font:500 11px 'DM Mono',monospace;background:#F1F5F9;border-radius:6px;padding:3px 8px">{{ r.meal }}</span><span style="font:500 11px 'DM Mono',monospace;background:#FEF3C7;color:#92400E;border-radius:6px;padding:3px 8px">{{ r.time }} MIN</span><span style="font:500 11px 'DM Mono',monospace;background:{{ r.mbg }};color:{{ r.mfg }};border-radius:6px;padding:3px 8px">{{ r.match }}% MATCH</span></div>
+              <div style="font-size:13px;color:#64748B">{{ r.missTxt }}</div>
+              <button onClick="{{ r.start }}" style="border:0;background:#059669;color:#fff;border-radius:12px;height:42px;font:700 14px 'DM Sans',sans-serif">Start cooking</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- SCREEN: RECIPES -->
+  <sc-if value="{{ isRecipes }}" hint-placeholder-val="{{ false }}">
+  <div style="display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;animation:fade .3s;align-items:start">
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:20px">
+      <div style="font:700 18px 'Bricolage Grotesque',sans-serif">Filters</div>
+      <div><div style="font:500 11px 'DM Mono',monospace;color:#64748B;letter-spacing:.08em;margin-bottom:8px">MEAL TYPE</div>
+        <div style="display:flex;flex-direction:column;gap:4px"><sc-for list="{{ meals }}" as="m" hint-placeholder-count="4"><button onClick="{{ m.pick }}" style="display:flex;justify-content:space-between;border:0;border-radius:10px;padding:9px 12px;font:600 14px 'DM Sans',sans-serif;background:{{ m.bg }};color:{{ m.fg }}">{{ m.label }}<span style="font-family:'DM Mono',monospace;font-weight:500">{{ m.n }}</span></button></sc-for></div></div>
+      <div><div style="font:500 11px 'DM Mono',monospace;color:#64748B;letter-spacing:.08em;margin-bottom:8px">DURATION</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ durs }}" as="d" hint-placeholder-count="4"><button onClick="{{ d.pick }}" style="border:1.5px solid {{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};border-radius:999px;padding:6px 12px;font:600 13px 'DM Sans',sans-serif">≤ {{ d.v }} min</button></sc-for></div></div>
+      <div><div style="font:500 11px 'DM Mono',monospace;color:#64748B;letter-spacing:.08em;margin-bottom:8px">DIETARY</div>
+        <div style="display:flex;flex-direction:column;gap:6px"><sc-for list="{{ diets }}" as="d" hint-placeholder-count="3"><button onClick="{{ d.toggle }}" style="text-align:left;border:1.5px solid {{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};border-radius:10px;padding:9px 12px;font:600 14px 'DM Sans',sans-serif">{{ d.mark }}{{ d.label }}</button></sc-for></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div><div style="font:800 34px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">Recipe match</div><div style="color:#64748B;font-size:16px;margin-top:8px">{{ recCount }} recipes from {{ ingCount }} pantry items · sorted by ingredient coverage</div></div>
+      <sc-for list="{{ recs }}" as="r" hint-placeholder-count="3">
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:20px;padding:18px;display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:20px;align-items:center">
+          <div style="height:96px;border-radius:14px;background:repeating-linear-gradient(135deg,{{ r.c1 }} 0 10px,{{ r.c2 }} 10px 20px)"></div>
+          <div style="display:flex;flex-direction:column;gap:9px;min-width:0">
+            <div style="font:700 22px 'Bricolage Grotesque',sans-serif">{{ r.name }}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font:500 11px 'DM Mono',monospace;background:#F1F5F9;border-radius:6px;padding:3px 8px">{{ r.meal }}</span><span style="font:500 11px 'DM Mono',monospace;background:#FEF3C7;color:#92400E;border-radius:6px;padding:3px 8px">{{ r.time }} MIN</span>
+              <sc-for list="{{ r.tags }}" as="t" hint-placeholder-count="1"><span style="font:500 11px 'DM Mono',monospace;background:{{ t.bg }};color:{{ t.fg }};border-radius:6px;padding:3px 8px">{{ t.t }}</span></sc-for></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="flex:1;max-width:260px;height:8px;background:#E2E8F0;border-radius:99px;overflow:hidden"><div style="height:100%;width:{{ r.match }}%;background:{{ r.mfg }}"></div></div><span style="font:600 13px 'DM Mono',monospace;color:{{ r.mfg }}">{{ r.match }}%</span><span style="font-size:13px;color:#64748B">{{ r.missTxt }}</span></div>
+          </div>
+          <button onClick="{{ r.start }}" style="border:0;background:#059669;color:#fff;border-radius:14px;height:48px;padding:0 24px;font:700 15px 'DM Sans',sans-serif">Start cooking</button>
+        </div>
+      </sc-for>
+      <sc-if value="{{ noRecs }}" hint-placeholder-val="{{ false }}"><div style="background:#fff;border:1px dashed #CBD5E1;border-radius:20px;padding:36px;text-align:center;color:#64748B">No recipes pass the current rules. Loosen a filter or add ingredients.</div></sc-if>
+      <sc-if value="{{ hasExcl }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#FFF1F2;border:1px solid #FECDD3;border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:10px">
+        <div style="font:500 11px 'DM Mono',monospace;color:#BE123C;letter-spacing:.08em">EXCLUDED BY RULES</div>
+        <sc-for list="{{ excl }}" as="e" hint-placeholder-count="1"><div style="display:flex;gap:12px;align-items:center;font-size:15px"><span style="font-weight:600">{{ e.name }}</span><span style="color:#BE123C;font:600 12px 'DM Mono',monospace;background:#FFE4E6;border-radius:6px;padding:3px 8px">{{ e.why }}</span></div></sc-for>
+      </div></sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- SCREEN: COOK -->
+  <sc-if value="{{ isCook }}" hint-placeholder-val="{{ false }}">
+  <div style="display:grid;grid-template-columns:300px minmax(0,1fr) 300px;gap:22px;align-items:stretch;min-height:640px;animation:fade .3s">
+
+    <!-- AVATAR -->
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:16px;align-items:center">
+      <div key="{{ bubbleKey }}" style="width:100%;box-sizing:border-box;background:{{ bubbleBg }};color:{{ bubbleFg }};border-radius:18px 18px 18px 6px;padding:14px 16px;font:600 16px/1.4 'DM Sans',sans-serif;animation:pop .3s;position:relative;min-height:90px">{{ bubbleText }}
+        <div style="position:absolute;left:44px;bottom:-9px;width:18px;height:18px;background:{{ bubbleBg }};transform:rotate(45deg);border-radius:0 0 4px 0"></div></div>
+      <div style="position:relative;width:240px;height:260px;margin-top:8px;animation:{{ avAnim }}">
+        <div style="position:absolute;left:25px;bottom:0;width:190px;height:170px;background:#FF7A5C;border-radius:95px 95px 40px 40px"></div>
+        <div style="position:absolute;left:52px;bottom:120px;width:20px;height:60px;background:#FF7A5C;border-radius:20px 20px 0 0;transform:rotate(-14deg)"></div>
+        <div style="position:absolute;left:168px;bottom:120px;width:20px;height:60px;background:#FF7A5C;border-radius:20px 20px 0 0;transform:rotate(14deg)"></div>
+        <div style="position:absolute;left:62px;top:14px;width:116px;height:46px;background:#fff;border-radius:16px 16px 6px 6px;box-shadow:inset 0 -6px 0 #F1F5F9"></div>
+        <div style="position:absolute;left:54px;top:-4px;width:62px;height:52px;background:#fff;border-radius:50%"></div>
+        <div style="position:absolute;left:96px;top:-14px;width:70px;height:60px;background:#fff;border-radius:50%"></div>
+        <div style="position:absolute;left:130px;top:2px;width:56px;height:50px;background:#fff;border-radius:50%"></div>
+        <div style="position:absolute;left:72px;top:{{ browTop }}px;width:34px;height:0;border-top:4px solid #1E1B2E;border-radius:4px;transform:rotate({{ browL }}deg);opacity:{{ browOp }}"></div>
+        <div style="position:absolute;left:134px;top:{{ browTop }}px;width:34px;height:0;border-top:4px solid #1E1B2E;border-radius:4px;transform:rotate({{ browR }}deg);opacity:{{ browOp }}"></div>
+        <div style="position:absolute;left:78px;top:112px;width:26px;height:26px;border-radius:50%;background:#1E1B2E"><div style="position:absolute;left:6px;top:5px;width:8px;height:8px;background:#fff;border-radius:50%"></div></div>
+        <div style="position:absolute;left:136px;top:112px;width:26px;height:26px;border-radius:50%;background:#1E1B2E"><div style="position:absolute;left:6px;top:5px;width:8px;height:8px;background:#fff;border-radius:50%"></div></div>
+        <div style="position:absolute;left:58px;top:142px;width:22px;height:14px;border-radius:50%;background:#FF9B84"></div>
+        <div style="position:absolute;left:160px;top:142px;width:22px;height:14px;border-radius:50%;background:#FF9B84"></div>
+        <div style="position:absolute;left:{{ mouthLeft }}px;top:148px;width:{{ mouthW }}px;height:{{ mouthH }}px;background:{{ mouthFill }};border:3.5px solid #1E1B2E;border-top-color:{{ mouthTop }};border-radius:{{ mouthR }};box-sizing:border-box;transition:all .3s"></div>
+        <sc-if value="{{ showPoint }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:-40px;top:160px;width:90px;height:26px;background:#FF7A5C;border-radius:14px;transform:rotate(-24deg);transform-origin:left center;animation:pop .3s"><div style="position:absolute;right:-6px;top:2px;width:26px;height:22px;background:#FFB199;border-radius:50%"></div></div></sc-if>
+        <sc-if value="{{ showSpark }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:-6px;top:30px;font:700 26px sans-serif;color:#D97706;animation:bob 1.2s infinite">✦</div><div style="position:absolute;right:-4px;top:6px;font:700 20px sans-serif;color:#059669;animation:bob 1.6s infinite">✦</div></sc-if>
+      </div>
+      <div style="width:100%;display:flex;flex-direction:column;gap:8px;margin-top:auto">
+        <div style="font:500 11px 'DM Mono',monospace;color:#64748B;letter-spacing:.08em">EXPRESSION</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ poses }}" as="p" hint-placeholder-count="5"><span style="font:600 12px 'DM Sans',sans-serif;padding:6px 10px;border-radius:999px;background:{{ p.bg }};color:{{ p.fg }}">{{ p.label }}</span></sc-for>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP -->
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:24px;padding:28px 34px;display:flex;flex-direction:column;gap:22px;position:relative;overflow:hidden">
+      <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;animation:pop .4s">
+          <div style="font:500 12px 'DM Mono',monospace;background:#D1FAE5;color:#047857;padding:5px 12px;border-radius:999px">ALL {{ total }} STEPS COMPLETE</div>
+          <div style="font:800 64px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em">Buon appetito!</div>
+          <div style="font-size:22px;color:#64748B">{{ recName }} is ready.</div>
+          <div style="display:flex;gap:12px;margin-top:10px"><button onClick="{{ restart }}" style="border:1px solid #E2E8F0;background:#fff;border-radius:14px;height:52px;padding:0 24px;font:700 16px 'DM Sans',sans-serif">Cook again</button><button onClick="{{ goRecipes }}" style="border:0;background:#059669;color:#fff;border-radius:14px;height:52px;padding:0 24px;font:700 16px 'DM Sans',sans-serif">Find another recipe</button></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ notDone }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font:700 13px 'DM Mono',monospace;letter-spacing:.06em;padding:6px 14px;border-radius:999px;background:{{ stageBg }};color:{{ stageFg }}">{{ stage }}</span>
+          <span style="font:500 14px 'DM Mono',monospace;color:#64748B">STEP {{ stepNum }} / {{ total }}</span>
+          <span style="margin-left:auto;font:600 14px 'DM Sans',sans-serif;color:#64748B">{{ recName }}</span>
+        </div>
+        <div style="font:800 58px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.025em;text-wrap:balance">{{ stepTitle }}</div>
+        <div style="font:500 30px/1.4 'DM Sans',sans-serif;color:#1E293B;text-wrap:pretty;max-width:760px">{{ stepText }}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px">
+          <sc-for list="{{ stepIngs }}" as="i" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:12px;background:{{ i.bg }};border:2px solid {{ i.bd }};border-radius:16px;padding:12px 18px">
+              <span style="font:700 28px 'Bricolage Grotesque',sans-serif;color:#0F172A">{{ i.q }}</span><span style="font:600 20px 'DM Sans',sans-serif;color:#334155">{{ i.n }}</span><span style="font:500 10px 'DM Mono',monospace;background:#fff;border-radius:6px;padding:3px 7px;color:{{ i.tfg }}">{{ i.tag }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ hasTimer }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:26px;background:{{ timerCardBg }};border-radius:22px;padding:20px 26px">
+            <div style="position:relative;width:132px;height:132px;flex:none;border-radius:50%;background:conic-gradient({{ timerCol }} {{ timerDeg }}deg,#fff 0);animation:{{ timerAnim }}">
+              <div style="position:absolute;inset:12px;border-radius:50%;background:#fff;display:grid;place-items:center;font:700 30px 'DM Mono',monospace;color:{{ timerCol }}">{{ timerText }}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="font:700 24px 'Bricolage Grotesque',sans-serif;color:#0F172A">{{ timerLabel }}</div>
+              <div style="display:flex;gap:8px"><button onClick="{{ toggleTimer }}" style="border:0;background:{{ timerCol }};color:#fff;border-radius:12px;height:44px;padding:0 20px;font:700 15px 'DM Sans',sans-serif">{{ timerBtn }}</button><button onClick="{{ addMin }}" style="border:1px solid rgba(15,23,42,.15);background:#fff;border-radius:12px;height:44px;padding:0 16px;font:700 15px 'DM Sans',sans-serif">+1 min</button></div>
+            </div>
+          </div>
+        </sc-if>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;align-items:center">
+          <button onClick="{{ openMissing }}" style="border:1.5px solid #FDA4AF;background:#FFF1F2;color:#BE123C;border-radius:14px;height:52px;padding:0 20px;font:700 16px 'DM Sans',sans-serif">I don't have this</button>
+          <button onClick="{{ openWrong }}" style="border:1.5px solid #FDA4AF;background:#fff;color:#BE123C;border-radius:14px;height:52px;padding:0 20px;font:700 16px 'DM Sans',sans-serif">Result looks wrong</button>
+          <div style="margin-left:auto;display:flex;gap:10px">
+            <button onClick="{{ prev }}" style="border:1px solid #E2E8F0;background:#fff;border-radius:14px;height:52px;padding:0 20px;font:700 16px 'DM Sans',sans-serif;opacity:{{ prevOp }}">← Back</button>
+            <button onClick="{{ next }}" style="border:0;background:#059669;color:#fff;border-radius:14px;height:52px;padding:0 30px;font:700 18px 'DM Sans',sans-serif">{{ nextLabel }} →</button>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <!-- VOICE -->
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:18px">
+      <div style="background:#0F172A;border-radius:18px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:14px">
+        <div style="display:flex;align-items:center;gap:6px;height:64px">
+          <sc-for list="{{ bars }}" as="b" hint-placeholder-count="9"><div style="width:7px;height:64px;border-radius:4px;background:#34D399;transform-origin:center;animation:bar {{ b.d }}s ease-in-out {{ b.delay }}s infinite"></div></sc-for>
+        </div>
+        <div style="font:600 16px 'DM Sans',sans-serif;color:#fff">Listening for commands…</div>
+        <div style="font:400 13px 'DM Mono',monospace;color:#94A3B8;text-align:center;min-height:34px">{{ heard }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font:500 11px 'DM Mono',monospace;color:#64748B;letter-spacing:.08em">SAY OR TAP</div>
+        <sc-for list="{{ pills }}" as="p" hint-placeholder-count="4">
+          <button onClick="{{ p.go }}" style="display:flex;align-items:center;gap:10px;border:1.5px solid #A7F3D0;background:#ECFDF5;color:#065F46;border-radius:14px;padding:13px 16px;font:600 17px 'DM Sans',sans-serif;text-align:left" style-hover="background:#D1FAE5"><span style="width:8px;height:8px;border-radius:50%;background:#059669"></span>“{{ p.label }}”</button>
+        </sc-for>
+      </div>
+      <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+        <div style="font:500 11px 'DM Mono',monospace;color:#64748B;letter-spacing:.08em">STEPS</div>
+        <sc-for list="{{ rail }}" as="s" hint-placeholder-count="6">
+          <button onClick="{{ s.go }}" style="display:flex;align-items:center;gap:10px;border:0;background:{{ s.bg }};border-radius:10px;padding:7px 10px;text-align:left;font:600 13px 'DM Sans',sans-serif;color:{{ s.fg }}"><span style="width:20px;height:20px;border-radius:50%;background:{{ s.dot }};color:#fff;display:grid;place-items:center;font:600 10px 'DM Mono',monospace">{{ s.mark }}</span><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.title }}</span><span style="font:500 10px 'DM Mono',monospace;color:#64748B">{{ s.stage }}</span></button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+  </main>
+</div>
+
+<!-- MODAL -->
+<sc-if value="{{ subOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeModal }}" style="position:absolute;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:30;display:grid;place-items:center;animation:fade .2s">
+  <div onClick="{{ stop }}" style="width:min(680px,92%);max-height:88%;overflow:auto;background:#fff;border-radius:26px;padding:28px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 80px rgba(15,23,42,.3);animation:pop .25s">
+    <div style="display:flex;align-items:start;justify-content:space-between">
+      <div><div style="font:800 28px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">Quick fix</div><div style="color:#64748B;font-size:15px;margin-top:4px">Step {{ stepNum }} stays paused at “{{ stepTitle }}”. Timer {{ modalTimerNote }}.</div></div>
+      <button onClick="{{ closeModal }}" style="border:0;background:#F1F5F9;border-radius:50%;width:38px;height:38px;font-size:14px">✕</button>
+    </div>
+    <div style="display:flex;background:#F1F5F9;border-radius:14px;padding:4px;gap:4px">
+      <button onClick="{{ openMissing }}" style="flex:1;border:0;border-radius:11px;height:42px;font:700 15px 'DM Sans',sans-serif;background:{{ tabMissBg }};color:{{ tabMissFg }};box-shadow:{{ tabMissSh }}">I don't have this</button>
+      <button onClick="{{ openWrong }}" style="flex:1;border:0;border-radius:11px;height:42px;font:700 15px 'DM Sans',sans-serif;background:{{ tabWrongBg }};color:{{ tabWrongFg }};box-shadow:{{ tabWrongSh }}">Result looks wrong</button>
+    </div>
+    <sc-if value="{{ modeMissing }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span style="font:500 11px 'DM Mono',monospace;color:#64748B;letter-spacing:.08em">MISSING</span>
+          <sc-for list="{{ subTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.pick }}" style="border:1.5px solid {{ t.bd }};background:{{ t.bg }};color:{{ t.fg }};border-radius:999px;padding:7px 14px;font:600 14px 'DM Sans',sans-serif">{{ t.n }} · {{ t.q }}</button></sc-for></div>
+        <sc-for list="{{ alts }}" as="a" hint-placeholder-count="2">
+          <div style="display:flex;align-items:center;gap:16px;border:1.5px solid {{ a.bd }};background:{{ a.bg }};border-radius:18px;padding:16px 18px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <div style="font:700 20px 'Bricolage Grotesque',sans-serif">Replace {{ a.from }} with {{ a.to }} — {{ a.q }}</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:14px;color:#64748B">{{ a.note }}</span><span style="font:600 11px 'DM Mono',monospace;padding:3px 8px;border-radius:6px;background:{{ a.tagBg }};color:{{ a.tagFg }}">{{ a.tag }}</span></div>
+            </div>
+            <button onClick="{{ a.apply }}" style="border:0;background:{{ a.btnBg }};color:#fff;border-radius:12px;height:46px;padding:0 20px;font:700 15px 'DM Sans',sans-serif">{{ a.btn }}</button>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ modeWrong }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ fixes }}" as="f" hint-placeholder-count="3">
+          <button onClick="{{ f.pick }}" style="text-align:left;border:1.5px solid {{ f.bd }};background:{{ f.bg }};border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:4px">
+            <span style="font:700 18px 'Bricolage Grotesque',sans-serif;color:#0F172A">{{ f.sym }}</span><span style="font:500 15px/1.4 'DM Sans',sans-serif;color:#334155">{{ f.fix }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+    <button onClick="{{ closeModal }}" style="border:0;background:#0F172A;color:#fff;border-radius:14px;height:50px;font:700 16px 'DM Sans',sans-serif">Back to cooking</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- DEV BAR -->
+<div style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:40;background:#0F172A;border-radius:18px;padding:8px 10px;display:flex;align-items:center;gap:6px;box-shadow:0 14px 40px rgba(15,23,42,.35);white-space:nowrap">
+  <span style="font:500 10px 'DM Mono',monospace;color:#64748B;padding:0 8px">SCREEN</span>
+  <sc-for list="{{ devScreens }}" as="d" hint-placeholder-count="3"><button onClick="{{ d.go }}" style="border:0;border-radius:10px;height:34px;padding:0 12px;font:600 13px 'DM Sans',sans-serif;background:{{ d.bg }};color:#fff">{{ d.label }}</button></sc-for>
+  <span style="width:1px;height:22px;background:#334155;margin:0 6px"></span>
+  <span style="font:500 10px 'DM Mono',monospace;color:#64748B;padding:0 8px">AVATAR</span>
+  <sc-for list="{{ devPoses }}" as="d" hint-placeholder-count="4"><button onClick="{{ d.go }}" style="border:0;border-radius:10px;height:34px;padding:0 12px;font:600 13px 'DM Sans',sans-serif;background:{{ d.bg }};color:#fff">{{ d.label }}</button></sc-for>
+</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    screen: 'scan', recipeId: 'pasta', step: 0, pose: 'idle', say: null, bk: 0,
+    left: 0, total: 0, running: false, done: false, subOpen: false, subMode: 'missing', subFor: 0, applied: {},
+    ings: [
+      { name: 'Eggs', cat: 'Proteins', qty: 6, unit: 'pcs' }, { name: 'Tomato', cat: 'Produce', qty: 4, unit: 'pcs' },
+      { name: 'Garlic', cat: 'Produce', qty: 6, unit: 'cloves' }, { name: 'Onion', cat: 'Produce', qty: 2, unit: 'pcs' },
+      { name: 'Basil', cat: 'Produce', qty: 1, unit: 'bunch' }, { name: 'Butter', cat: 'Dairy', qty: 100, unit: 'g' },
+      { name: 'Parmesan', cat: 'Dairy', qty: 80, unit: 'g' }, { name: 'Salt', cat: 'Spices', qty: 1, unit: 'jar' },
+      { name: 'Chilli flakes', cat: 'Spices', qty: 1, unit: 'jar' }, { name: 'Olive Oil', cat: 'Pantry', qty: 500, unit: 'ml' },
+      { name: 'Pasta', cat: 'Pantry', qty: 500, unit: 'g' }
+    ],
+    diet: { gf: false, df: false, nut: false }, maxTime: 45, meal: 'All', query: '', addText: '', searchOpen: false, heard: 'Try: “Next step”'
+  };
+  CATS = ['Proteins', 'Produce', 'Dairy', 'Spices', 'Pantry'];
+  BOXES = [
+    { label: 'Tomato', pct: 94, x: 8, y: 34, w: 20, h: 30 }, { label: 'Garlic', pct: 88, x: 34, y: 52, w: 14, h: 24 },
+    { label: 'Olive Oil', pct: 91, x: 56, y: 26, w: 12, h: 46 }, { label: 'Pasta', pct: 90, x: 74, y: 48, w: 18, h: 28 }
+  ];
+  S = (stage, title, text, ings, t, say, alert) => ({ stage, title, text, ings, t, say, alert });
+  R = {
+    pasta: { name: 'Garlic Butter Pasta', meal: 'Dinner', time: 25, al: ['gluten', 'dairy'], needs: ['Pasta', 'Garlic', 'Butter', 'Parmesan', 'Salt'], c: ['#FDE7C3', '#FBEBD3'], steps: null },
+    soup: { name: 'Rustic Tomato Soup', meal: 'Lunch', time: 40, al: [], needs: ['Tomato', 'Onion', 'Garlic', 'Olive Oil', 'Basil', 'Salt'], c: ['#FECACA', '#FEE2E2'], steps: null },
+    shak: { name: 'Shakshuka', meal: 'Breakfast', time: 25, al: [], needs: ['Eggs', 'Tomato', 'Onion', 'Garlic', 'Olive Oil', 'Chilli flakes'], c: ['#D1FAE5', '#E6F9EF'], steps: null },
+    aglio: { name: 'Aglio e Olio', meal: 'Dinner', time: 15, al: ['gluten'], needs: ['Pasta', 'Garlic', 'Olive Oil', 'Chilli flakes', 'Salt'], c: ['#FEF3C7', '#FDF6D8'], steps: null }
+  };
+  SUBS = {
+    Butter: [{ to: 'Olive Oil', q: '2½ tbsp', note: 'Same richness, slightly fruitier', al: [] }, { to: 'Ghee', q: '3 tbsp', note: 'Closest flavour match', al: ['dairy'] }],
+    Garlic: [{ to: 'Garlic powder', q: '1 tsp', note: 'Add with the oil, not dry', al: [] }, { to: 'Shallot', q: '1 small, minced', note: 'Milder, sweeter', al: [] }],
+    Pasta: [{ to: 'Rice noodles', q: '500 g', note: 'Cook 2 min less', al: [] }, { to: 'Wheat spaghetti', q: '500 g', note: 'Standard swap', al: ['gluten'] }],
+    Tomato: [{ to: 'Canned tomatoes', q: '400 g', note: 'Crush by hand first', al: [] }],
+    Parmesan: [{ to: 'Nutritional yeast', q: '3 tbsp', note: 'Nutty, dairy-free', al: [] }, { to: 'Pecorino', q: '60 g', note: 'Sharper, saltier', al: ['dairy'] }],
+    Onion: [{ to: 'Leek', q: '1 white part', note: 'Slice thin', al: [] }],
+    Basil: [{ to: 'Dried oregano', q: '1 tsp', note: 'Add earlier in cooking', al: [] }],
+    'Olive Oil': [{ to: 'Butter', q: '1 tbsp', note: 'Use less, browns faster', al: ['dairy'] }, { to: 'Sunflower oil', q: '2 tbsp', note: 'Neutral flavour', al: [] }],
+    Eggs: [{ to: 'Firm tofu', q: '200 g, crumbled', note: 'Simmer 3 min longer', al: [] }],
+    Salt: [{ to: 'Soy sauce', q: '1 tsp', note: 'Contains gluten in most brands', al: ['gluten'] }],
+    'Chilli flakes': [{ to: 'Black pepper', q: '½ tsp', note: 'Milder heat', al: [] }]
+  };
+  FIXES = [
+    { sym: 'Garlic is browning too fast', fix: 'Lower the heat to medium-low and add a splash of pasta water. Stir constantly.' },
+    { sym: 'Sauce looks too thin', fix: 'Simmer 2 more minutes uncovered, then stir in a spoon of starchy water or grated cheese.' },
+    { sym: 'Sauce looks too salty', fix: 'Add a squeeze of lemon and a little unsalted liquid. Skip extra salt at the end.' }
+  ];
+  DIETS = [['gf', 'Gluten-Free', 'gluten'], ['df', 'Dairy-Free', 'dairy'], ['nut', 'Nut Allergy', 'nuts']];
+  STAGE = { Prep: ['#E0F2FE', '#075985'], Cook: ['#FEF3C7', '#92400E'], Simmer: ['#FFEDD5', '#9A3412'], Serve: ['#D1FAE5', '#065F46'] };
+
+  componentDidMount() {
+    const S = this.S;
+    this.R.pasta.steps = [
+      S('Prep', 'Mince the garlic', 'Mince 4 cloves of garlic and halve 200 g of tomatoes.', [['Garlic', '4 cloves'], ['Tomato', '200 g']], 0, 'Let’s start with prep. Mince the garlic fine.', ''),
+      S('Cook', 'Boil the pasta', 'Boil 500 g of pasta in salted water for 10 minutes.', [['Pasta', '500 g'], ['Salt', '1 tbsp']], 600, 'Salt the water well. I’ll watch the clock.', 'Time’s up! Drain the pasta now and keep a cup of water.'),
+      S('Cook', 'Melt the butter', 'Melt 3 tbsp of butter on medium heat, then stir the garlic for 1 minute.', [['Butter', '3 tbsp'], ['Garlic', '4 cloves']], 60, 'Medium heat only. Garlic burns fast.', 'One minute. Add the tomatoes now.'),
+      S('Simmer', 'Simmer with tomato', 'Add the tomatoes and simmer gently for 5 minutes.', [['Tomato', '200 g']], 300, 'Small bubbles are perfect.', 'Sauce is ready. Turn the heat off.'),
+      S('Cook', 'Toss together', 'Toss the drained pasta in the pan with ½ cup of pasta water.', [['Pasta', '500 g']], 0, 'Keep tossing until the sauce clings.', ''),
+      S('Serve', 'Plate and finish', 'Top with 40 g of parmesan and a few basil leaves. Serve hot.', [['Parmesan', '40 g'], ['Basil', '6 leaves']], 0, 'Almost there. Cheese first, then basil.', '')
+    ];
+    this.R.soup.steps = [
+      S('Prep', 'Chop the base', 'Dice 1 onion and 3 cloves of garlic. Quarter 800 g of tomatoes.', [['Onion', '1 whole'], ['Garlic', '3 cloves'], ['Tomato', '800 g']], 0, 'Chop everything roughly. It all gets blended later.', ''),
+      S('Cook', 'Soften the onion', 'Warm 3 tbsp of olive oil and cook the onion and garlic for 5 minutes.', [['Olive Oil', '3 tbsp'], ['Onion', '1 whole']], 300, 'Soft and glossy, not brown.', 'Onions are soft. Add the tomatoes.'),
+      S('Simmer', 'Simmer the tomatoes', 'Add the tomatoes and 1 tsp of salt. Simmer for 20 minutes.', [['Tomato', '800 g'], ['Salt', '1 tsp']], 1200, 'Stir every few minutes.', 'Twenty minutes done. Time to blend.'),
+      S('Cook', 'Blend', 'Blend coarsely, leaving some texture.', [], 0, 'Careful, it’s hot. Pulse it a few times.', ''),
+      S('Serve', 'Serve', 'Ladle into bowls and top with basil and a drizzle of olive oil.', [['Basil', '8 leaves'], ['Olive Oil', '1 tbsp']], 0, 'Finish with basil. Serve warm.', '')
+    ];
+    this.R.shak.steps = [
+      S('Prep', 'Slice and chop', 'Slice 1 onion, mince 3 cloves of garlic and chop 500 g of tomatoes.', [['Onion', '1 whole'], ['Garlic', '3 cloves'], ['Tomato', '500 g']], 0, 'Fine dice on the garlic.', ''),
+      S('Cook', 'Fry the base', 'Heat 2 tbsp of olive oil. Fry the onion and garlic with 1 tsp chilli flakes for 4 minutes.', [['Olive Oil', '2 tbsp'], ['Chilli flakes', '1 tsp']], 240, 'Chilli goes in with the onion.', 'Base is ready. Add tomatoes.'),
+      S('Simmer', 'Simmer the sauce', 'Add the tomatoes and simmer for 10 minutes until thick.', [['Tomato', '500 g']], 600, 'Thick enough to hold a spoon line.', 'Sauce is thick. Make wells for the eggs.'),
+      S('Cook', 'Add the eggs', 'Crack 4 eggs into wells in the sauce. Cover and cook for 6 minutes.', [['Eggs', '4 pcs']], 360, 'Cover the pan and leave it alone.', 'Whites should be set. Check now.'),
+      S('Serve', 'Serve', 'Serve straight from the pan with a pinch of salt.', [['Salt', '1 pinch']], 0, 'Bring the whole pan to the table.', '')
+    ];
+    this.R.aglio.steps = [
+      S('Prep', 'Slice the garlic', 'Slice 6 cloves of garlic thinly.', [['Garlic', '6 cloves']], 0, 'Thin slices, not minced.', ''),
+      S('Cook', 'Boil the pasta', 'Boil 500 g of pasta in salted water for 9 minutes.', [['Pasta', '500 g'], ['Salt', '1 tbsp']], 540, 'Save a cup of pasta water.', 'Drain now, keep the water.'),
+      S('Cook', 'Infuse the oil', 'Warm 5 tbsp of olive oil with the garlic and 1 tsp chilli flakes for 2 minutes.', [['Olive Oil', '5 tbsp'], ['Chilli flakes', '1 tsp']], 120, 'Gentle heat, golden not brown.', 'Garlic is golden. Add the pasta.'),
+      S('Serve', 'Toss and serve', 'Toss the pasta in the oil with a splash of pasta water. Serve.', [['Pasta', '500 g']], 0, 'Toss hard so it turns creamy.', '')
+    ];
+    this.tick = setInterval(() => {
+      if (this.state.running && this.state.left > 0) {
+        const l = this.state.left - 1;
+        if (l <= 0) { const st = this.cur(); this.setState({ left: 0, running: false, pose: 'timer', say: st.alert || 'Time’s up!', bk: this.state.bk + 1 }); }
+        else this.setState({ left: l });
+      }
+    }, 1000);
+    this.forceUpdate();
+  }
+  componentWillUnmount() { clearInterval(this.tick); }
+
+  rec() { return this.R[this.state.recipeId]; }
+  steps() { return this.rec().steps || []; }
+  cur() { return this.steps()[this.state.step] || { stage: 'Prep', title: '', text: '', ings: [], t: 0, say: '', alert: '' }; }
+  poseFor(st) { return st.ings.length ? 'pointing' : 'explaining'; }
+  goStep(i, extra) {
+    const steps = this.steps(); if (i >= steps.length) return this.setState({ done: true, pose: 'done', say: null, running: false, bk: this.state.bk + 1 });
+    i = Math.max(0, i); const st = steps[i];
+    this.setState({ step: i, done: false, left: st.t, total: st.t, running: false, pose: this.poseFor(st), say: null, subOpen: false, bk: this.state.bk + 1, ...(extra || {}) });
+  }
+  startRecipe(id) { this.setState({ recipeId: id, screen: 'cook', applied: {} }, () => this.goStep(0)); }
+  fmt(s) { return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+  hear(t, fn) { this.setState({ heard: 'Heard: “' + t + '”' }); fn(); }
+  banned() { const b = []; this.DIETS.forEach(d => { if (this.state.diet[d[0]]) b.push(d[2]); }); return b; }
+  eligible() {
+    const s = this.state, ban = this.banned(), q = s.query.trim().toLowerCase();
+    const have = n => s.ings.some(i => i.name === n);
+    const all = Object.keys(this.R).map(id => {
+      const r = this.R[id], h = r.needs.filter(have), miss = r.needs.filter(n => !have(n));
+      const conf = r.al.filter(a => ban.includes(a));
+      return { id, r, match: Math.round(h.length / r.needs.length * 100), miss, conf };
+    });
+    const excl = all.filter(x => x.conf.length).map(x => ({ name: x.r.name, why: 'Contains ' + x.conf.join(', ') }));
+    all.filter(x => !x.conf.length && x.r.time > s.maxTime).forEach(x => excl.push({ name: x.r.name, why: x.r.time + ' min > ' + s.maxTime + ' min limit' }));
+    const base = all.filter(x => !x.conf.length && x.r.time <= s.maxTime && (!q || x.r.name.toLowerCase().includes(q) || x.r.needs.some(n => n.toLowerCase().includes(q))));
+    return { base, excl };
+  }
+  renderVals() {
+    const s = this.state, st = this.cur(), steps = this.steps(), set = o => this.setState(o), r = this.rec();
+    const scr = k => () => set({ screen: k, subOpen: false, searchOpen: false });
+    const ban = this.banned();
+    const { base, excl } = this.eligible();
+    const mealsList = ['All', 'Breakfast', 'Lunch', 'Dinner'];
+    const list = base.filter(x => s.meal === 'All' || x.r.meal === s.meal).sort((a, b) => b.match - a.match);
+    const tagsFor = x => {
+      const t = [];
+      if (!x.r.al.includes('gluten')) t.push({ t: 'GLUTEN-FREE', bg: '#D1FAE5', fg: '#065F46' });
+      if (!x.r.al.includes('dairy')) t.push({ t: 'DAIRY-FREE', bg: '#D1FAE5', fg: '#065F46' });
+      x.r.al.forEach(a => t.push({ t: 'CONTAINS ' + a.toUpperCase(), bg: '#FFE4E6', fg: '#BE123C' }));
+      return t;
+    };
+    const recs = list.map(x => ({
+      name: x.r.name, meal: x.r.meal.toUpperCase(), time: x.r.time, match: x.match, c1: x.r.c[0], c2: x.r.c[1], tags: tagsFor(x),
+      mbg: x.match === 100 ? '#D1FAE5' : '#FEF3C7', mfg: x.match === 100 ? '#047857' : '#B45309',
+      missTxt: x.miss.length ? 'Missing: ' + x.miss.join(', ') : 'You have everything', start: () => this.startRecipe(x.id)
+    }));
+    const dietsV = this.DIETS.map(d => { const on = s.diet[d[0]]; return { label: d[1], mark: on ? '✓ ' : '', bd: on ? '#059669' : '#E2E8F0', bg: on ? '#ECFDF5' : '#fff', fg: on ? '#065F46' : '#334155', toggle: () => set({ diet: { ...s.diet, [d[0]]: !on } }) }; });
+    const groups = this.CATS.map(cat => ({
+      cat: cat.toUpperCase(), items: s.ings.map((i, ix) => ({ ...i, ix })).filter(i => i.cat === cat).map(i => {
+        const step = i.unit === 'g' ? 50 : i.unit === 'ml' ? 100 : 1;
+        return { name: i.name, qty: i.qty + ' ' + i.unit, minus: () => set({ ings: s.ings.map((z, k) => k === i.ix ? { ...z, qty: Math.max(0, z.qty - step) } : z) }), plus: () => set({ ings: s.ings.map((z, k) => k === i.ix ? { ...z, qty: z.qty + step } : z) }), remove: () => set({ ings: s.ings.filter((z, k) => k !== i.ix) }) };
+      })
+    })).filter(g => g.items.length);
+    const addIngredient = (name) => { name = name.trim(); if (!name || s.ings.some(i => i.name.toLowerCase() === name.toLowerCase())) return set({ addText: '' }); const cap = name[0].toUpperCase() + name.slice(1); set({ ings: [...s.ings, { name: cap, cat: 'Pantry', qty: 1, unit: 'pcs' }], addText: '' }); };
+    const stageC = this.STAGE[st.stage] || this.STAGE.Prep;
+    const applied = s.applied;
+    const stepIngs = st.ings.map(([n, q]) => { const a = applied[n]; const safe = !a; return { n: a ? a.to : n, q: a ? a.q : q, bg: a ? '#FEF3C7' : '#F8FAFC', bd: a ? '#D97706' : '#E2E8F0', tag: a ? 'SWAPPED' : 'ON HAND', tfg: a ? '#92400E' : '#047857' }; });
+    const stepText = st.ings.reduce((t, [n]) => applied[n] ? t.replace(new RegExp(n, 'i'), applied[n].to.toLowerCase()) : t, st.text);
+    const timerDone = st.t > 0 && s.left === 0 && !s.running && s.pose === 'timer';
+    const timerCol = timerDone ? '#E11D48' : '#D97706';
+    const P = s.pose;
+    const bubbles = {
+      idle: 'Ready when you are. Say “Next step” to begin.', explaining: s.say || st.say,
+      pointing: s.say || (st.ings[0] ? 'Grab the ' + (applied[st.ings[0][0]] ? applied[st.ings[0][0]].to.toLowerCase() : st.ings[0][0].toLowerCase()) + ': ' + (applied[st.ings[0][0]] ? applied[st.ings[0][0]].q : st.ings[0][1]) + '.' : st.say),
+      timer: s.say || st.alert || 'Time’s up!', sub: 'No problem. I’ve found a swap that keeps the recipe on track.', done: 'Buon appetito! Everything is plated.'
+    };
+    const isAlert = P === 'timer', isSub = P === 'sub';
+    const mouth = { idle: [96, 48, 14, 'transparent', 'transparent', '0 0 30px 30px'], explaining: [100, 40, 30, '#7A1F12', '#1E1B2E', '50%'], pointing: [96, 48, 18, 'transparent', 'transparent', '0 0 30px 30px'], timer: [104, 32, 32, '#7A1F12', '#1E1B2E', '50%'], sub: [98, 44, 0, 'transparent', '#1E1B2E', '4px'], done: [90, 60, 32, '#7A1F12', 'transparent', '0 0 40px 40px'] }[P] || [96, 48, 14, 'transparent', 'transparent', '0 0 30px 30px'];
+    const poseDefs = [['idle', 'Idle'], ['explaining', 'Explaining'], ['pointing', 'Pointing at ingredient'], ['timer', 'Timer alert'], ['sub', 'Substitution suggestion']];
+    const nextStep = () => this.goStep(s.step + 1);
+    const cmds = {
+      next: () => this.hear('Next step', nextStep),
+      repeat: () => this.hear('Repeat', () => set({ say: st.text, pose: 'explaining', bk: s.bk + 1 })),
+      missing: () => this.hear('I’m missing an ingredient', () => set({ subOpen: true, subMode: 'missing', pose: 'sub', running: false })),
+      left: () => this.hear('How long left?', () => set({ say: st.t ? (s.left ? 'About ' + this.fmt(s.left) + ' left.' : 'The timer has finished.') : 'This step has no timer.', pose: 'explaining', bk: s.bk + 1 }))
+    };
+    const alts = (() => {
+      const item = st.ings[s.subFor] || st.ings[0]; if (!item) return [];
+      return (this.SUBS[item[0]] || []).map(a => {
+        const blocked = a.al.filter(x => ban.includes(x));
+        const on = applied[item[0]] && applied[item[0]].to === a.to;
+        return { from: item[0], to: a.to, q: a.q, note: a.note, tag: blocked.length ? 'BLOCKED · CONTAINS ' + blocked.join(', ').toUpperCase() : 'SAFE FOR YOUR RESTRICTIONS', tagBg: blocked.length ? '#FFE4E6' : '#D1FAE5', tagFg: blocked.length ? '#BE123C' : '#047857', bd: on ? '#059669' : '#E2E8F0', bg: blocked.length ? '#F8FAFC' : on ? '#ECFDF5' : '#fff', btn: on ? 'Applied ✓' : blocked.length ? 'Unavailable' : 'Use this', btnBg: blocked.length ? '#CBD5E1' : '#059669', apply: () => { if (!blocked.length) set({ applied: { ...applied, [item[0]]: { to: a.to, q: a.q } }, pose: 'pointing', say: 'Swapped to ' + a.to.toLowerCase() + ', ' + a.q + '. Carry on.', subOpen: false, bk: s.bk + 1 }); } };
+      });
+    })();
+    const q = s.query.trim().toLowerCase();
+    let suggestions = [];
+    if (s.searchOpen) {
+      const known = ['Tomato', 'Garlic', 'Olive Oil', 'Basil', 'Onion', 'Butter', 'Parmesan', 'Pasta', 'Eggs', 'Lemon', 'Spinach', 'Chicken'];
+      suggestions = [
+        ...Object.keys(this.R).filter(id => !q || this.R[id].name.toLowerCase().includes(q)).map(id => ({ type: 'RECIPE', label: this.R[id].name, hint: this.R[id].time + ' min', bg: '#FEF3C7', fg: '#92400E', pick: () => set({ query: '', searchOpen: false }, () => this.startRecipe(id)) })),
+        ...(q ? known.filter(k => k.toLowerCase().includes(q) && !s.ings.some(i => i.name === k)).map(k => ({ type: 'INGREDIENT', label: k, hint: 'Add to pantry', bg: '#D1FAE5', fg: '#065F46', pick: () => { addIngredient(k); set({ query: '', searchOpen: false, screen: 'scan' }); } })) : []),
+        ...(!q ? [{ type: 'VOICE', label: 'Show dairy-free dinners', hint: 'Applies filters', bg: '#E0F2FE', fg: '#075985', pick: () => set({ diet: { ...s.diet, df: true }, meal: 'Dinner', screen: 'recipes', searchOpen: false }) }] : [])
+      ].slice(0, 6);
+    }
+    const crumbs = [{ k: 'scan', label: 'Pantry Scan' }, { k: 'recipes', label: 'Recipe Match' }, { k: 'cook', label: s.done ? 'Finished' : 'Active Cooking Step ' + (s.step + 1) + ' of ' + steps.length }];
+    const idx = { scan: 0, recipes: 1, cook: 2 }[s.screen];
+    const poseBtn = (label, on, go) => ({ label, go, bg: on ? '#059669' : '#1E293B' });
+    const stepIng0 = st.ings[0];
+    return {
+      nav: [['scan', 'Pantry Scan'], ['recipes', 'Recipe Match'], ['cook', 'Cook']].map(([k, l], i) => ({ label: l, num: i + 1, go: scr(k), bg: s.screen === k ? '#ECFDF5' : 'transparent', fg: s.screen === k ? '#065F46' : '#334155', badgeBg: s.screen === k ? '#059669' : '#F1F5F9', badgeFg: s.screen === k ? '#fff' : '#64748B' })),
+      catCounts: this.CATS.map(c => ({ cat: c, n: s.ings.filter(i => i.cat === c).length })),
+      crumbs: crumbs.slice(0, idx + 1).map((c, i) => ({ label: c.label, sepDisplay: i ? 'inline' : 'none', fg: i === idx ? '#0F172A' : '#64748B', go: scr(c.k) })),
+      query: s.query, onQuery: e => set({ query: e.target.value, searchOpen: true }), openSearch: () => set({ searchOpen: true }),
+      closeSearch: () => s.searchOpen && set({ searchOpen: false }), showSuggest: s.searchOpen && (suggestions.length > 0 || !!q), suggestions, noSuggest: !!q && suggestions.length === 0,
+      goScan: scr('scan'), pillMic: () => set({ heard: 'Heard: “Show dairy-free dinners”', diet: { ...s.diet, df: true }, meal: 'Dinner', screen: 'recipes' }),
+      isScan: s.screen === 'scan', isRecipes: s.screen === 'recipes', isCook: s.screen === 'cook',
+      boxes: this.BOXES, rescan: () => set({ screen: 'scan' }), goRecipes: scr('recipes'),
+      groups, ingCount: s.ings.length, addText: s.addText, onAdd: e => set({ addText: e.target.value }), addKey: e => { if (e.key === 'Enter') addIngredient(s.addText); }, addIng: () => addIngredient(s.addText),
+      diets: dietsV, maxTime: s.maxTime, onTime: e => set({ maxTime: +e.target.value }),
+      recs, recCount: recs.length, noRecs: recs.length === 0, excl, hasExcl: excl.length > 0,
+      meals: mealsList.map(m => { const n = base.filter(x => m === 'All' || x.r.meal === m).length; const on = s.meal === m; return { label: m, n, bg: on ? '#ECFDF5' : 'transparent', fg: on ? '#065F46' : '#334155', pick: () => set({ meal: m }) }; }),
+      durs: [15, 30, 45, 60].map(v => { const on = s.maxTime === v; return { v, bd: on ? '#D97706' : '#E2E8F0', bg: on ? '#FEF3C7' : '#fff', fg: on ? '#92400E' : '#334155', pick: () => set({ maxTime: v }) }; }),
+      // cook
+      bubbleKey: s.bk + P, bubbleText: bubbles[P], bubbleBg: isAlert ? '#FFE4E6' : isSub ? '#FEF3C7' : P === 'done' ? '#D1FAE5' : '#F1F5F9', bubbleFg: isAlert ? '#9F1239' : isSub ? '#78350F' : P === 'done' ? '#065F46' : '#0F172A',
+      avAnim: P === 'timer' ? 'shake .4s infinite' : P === 'done' ? 'bob .8s infinite' : 'bob 3.2s ease-in-out infinite',
+      browTop: 96, browL: isAlert ? -18 : isSub ? 16 : 0, browR: isAlert ? 18 : isSub ? 0 : 0, browOp: isAlert || isSub ? 1 : 0,
+      mouthLeft: 120 - mouth[0] / 2 * 0 - mouth[1] / 2, mouthW: mouth[1], mouthH: mouth[2] || 0, mouthFill: mouth[3], mouthTop: mouth[4], mouthR: mouth[5],
+      showPoint: P === 'pointing', showSpark: P === 'done', poses: poseDefs.map(([k, l]) => ({ label: l, bg: P === k || (k === 'explaining' && P === 'done' && false) ? '#0F172A' : '#F1F5F9', fg: P === k ? '#fff' : '#475569' })),
+      isDone: s.done, notDone: !s.done, total: steps.length, recName: r.name, stage: st.stage.toUpperCase(), stageBg: stageC[0], stageFg: stageC[1], stepNum: s.step + 1, stepTitle: st.title, stepText, stepIngs,
+      hasTimer: st.t > 0, timerCol, timerCardBg: timerDone ? '#FFE4E6' : '#FEF3C7', timerDeg: s.total ? Math.round(s.left / s.total * 360) : 0, timerText: this.fmt(s.left),
+      timerAnim: timerDone ? 'ringr 1s infinite' : s.running ? 'ring 1.4s infinite' : 'none', timerLabel: timerDone ? 'Timer finished' : s.running ? 'Timer running' : 'Timer ready', timerBtn: s.running ? 'Pause' : timerDone ? 'Restart' : 'Start timer',
+      toggleTimer: () => set(timerDone || s.left === 0 ? { left: st.t, total: st.t, running: true, pose: this.poseFor(st), say: null } : { running: !s.running }),
+      addMin: () => set({ left: s.left + 60, total: s.total + 60, pose: timerDone ? this.poseFor(st) : s.pose }),
+      openMissing: () => set({ subOpen: true, subMode: 'missing', pose: 'sub', running: false }), openWrong: () => set({ subOpen: true, subMode: 'wrong', pose: 'sub', running: false }),
+      prev: () => this.goStep(s.step - 1), prevOp: s.step === 0 ? 0.4 : 1, next: nextStep, nextLabel: s.step === steps.length - 1 ? 'Finish' : 'Next step',
+      restart: () => this.goStep(0),
+      bars: [0.7, 1.1, 0.9, 1.3, 0.8, 1.2, 0.95, 1.05, 0.75].map((d, i) => ({ d, delay: -i * 0.13 })), heard: s.heard,
+      pills: [['Next Step', cmds.next], ['Repeat', cmds.repeat], ['I’m missing an ingredient', cmds.missing], ['How long left?', cmds.left]].map(([label, go]) => ({ label, go })),
+      rail: steps.map((z, i) => { const c = i === s.step && !s.done; const dn = i < s.step || s.done; return { title: z.title, stage: z.stage.toUpperCase(), mark: dn ? '✓' : i + 1, bg: c ? '#ECFDF5' : 'transparent', fg: c ? '#065F46' : '#475569', dot: dn ? '#059669' : c ? '#D97706' : '#CBD5E1', go: () => this.goStep(i) }; }),
+      // modal
+      subOpen: s.subOpen, closeModal: () => set({ subOpen: false, pose: this.poseFor(st) }), stop: e => e.stopPropagation(),
+      modalTimerNote: st.t ? (s.left === st.t || !st.t ? 'is paused' : 'paused at ' + this.fmt(s.left)) : 'not needed',
+      modeMissing: s.subMode === 'missing', modeWrong: s.subMode === 'wrong',
+      tabMissBg: s.subMode === 'missing' ? '#fff' : 'transparent', tabMissFg: s.subMode === 'missing' ? '#BE123C' : '#64748B', tabMissSh: s.subMode === 'missing' ? '0 1px 4px rgba(15,23,42,.12)' : 'none',
+      tabWrongBg: s.subMode === 'wrong' ? '#fff' : 'transparent', tabWrongFg: s.subMode === 'wrong' ? '#BE123C' : '#64748B', tabWrongSh: s.subMode === 'wrong' ? '0 1px 4px rgba(15,23,42,.12)' : 'none',
+      subTabs: st.ings.map(([n, qv], i) => { const on = i === s.subFor; return { n, q: qv, bd: on ? '#E11D48' : '#E2E8F0', bg: on ? '#FFF1F2' : '#fff', fg: on ? '#BE123C' : '#334155', pick: () => set({ subFor: i }) }; }),
+      alts, fixes: this.FIXES.map(f => ({ ...f, bd: '#E2E8F0', bg: '#fff', pick: () => set({ subOpen: false, pose: 'explaining', say: f.fix, bk: s.bk + 1 }) })),
+      devScreens: [['scan', 'Scan'], ['recipes', 'Recipes'], ['cook', 'Cook']].map(([k, l]) => ({ label: l, bg: s.screen === k ? '#059669' : '#1E293B', go: scr(k) })),
+      devPoses: [
+        poseBtn('Speaking', s.screen === 'cook' && P === 'explaining' && !s.done, () => set({ screen: 'cook', subOpen: false, done: false, pose: 'explaining', say: null, bk: s.bk + 1 })),
+        poseBtn('Timer Active', s.running || timerDone, () => { const i = steps.findIndex(z => z.t > 0); this.goStep(i < 0 ? 0 : i, { screen: 'cook', left: 12, total: 12, running: true, pose: 'explaining' }); }),
+        poseBtn('Error/Substitution', s.subOpen, () => set({ screen: 'cook', done: false, subOpen: true, subMode: 'missing', pose: 'sub', running: false })),
+        poseBtn('Finished', s.done, () => set({ screen: 'cook', subOpen: false, done: true, pose: 'done', running: false, bk: s.bk + 1 }))
+      ]
+    };
+  }
+}
+
+</script>
+</body>
+</html>
